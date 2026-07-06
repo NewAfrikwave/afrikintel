@@ -23,7 +23,7 @@ export function TopBar({ onLoginClick }: { onLoginClick?: () => void }) {
   const activeView = useAppStore((s) => s.activeView)
   const setActiveView = useAppStore((s) => s.setActiveView)
   const liveStats = useAppStore((s) => s.liveStats)
-  const [now, setNow] = useState<Date>(new Date())
+  const [now, setNow] = useState<Date | null>(null)
   const [livePulse, setLivePulse] = useState(false)
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export function TopBar({ onLoginClick }: { onLoginClick?: () => void }) {
       {/* Refresh / time */}
       <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground tabular-nums">
         <div className={cn('w-1.5 h-1.5 rounded-full', livePulse ? 'bg-emerald-500' : 'bg-muted-foreground/50')} />
-        <span>{now.toLocaleTimeString('en-US', { hour12: false })}</span>
+        <span>{now ? now.toLocaleTimeString('en-US', { hour12: false }) : '--:--:--'}</span>
       </div>
 
       {/* Actions */}

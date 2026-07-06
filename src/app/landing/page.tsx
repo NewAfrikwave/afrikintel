@@ -274,7 +274,7 @@ export default function LandingPage() {
             {/* CTAs */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href="/dashboard"
+                href="/demo"
                 className="group h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium flex items-center justify-center gap-2 transition-all hover:shadow-[0_0_30px_oklch(0.7_0.18_165/0.4)] hover:scale-105"
               >
                 Try the Live Demo
@@ -668,7 +668,7 @@ export default function LandingPage() {
             </p>
             <div className="relative flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                href="/dashboard"
+                href="/demo"
                 className="group h-11 px-6 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 text-sm font-medium flex items-center justify-center gap-2 transition-all hover:shadow-[0_0_30px_oklch(0.7_0.18_165/0.4)] hover:scale-105"
               >
                 Try Live Demo
@@ -700,7 +700,7 @@ export default function LandingPage() {
             <a href="#features" className="nav-link hover:text-foreground">Features</a>
             <a href="#pricing" className="nav-link hover:text-foreground">Pricing</a>
             <a href="https://github.com/NewAfrikwave/afrikintel" target="_blank" rel="noopener" className="nav-link hover:text-foreground">GitHub</a>
-            <a href="/dashboard" className="nav-link hover:text-foreground">Dashboard</a>
+            <a href="/demo" className="nav-link hover:text-foreground">Demo</a>
           </div>
         </div>
       </footer>
