@@ -255,7 +255,7 @@ export default function LandingPage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/5 text-emerald-400 text-xs font-medium mb-6 glow-pulse">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dot-pulse" />
-              Self-hostable · MIT Licensed · AI-Powered
+              Self-hostable · Hosted LTD · AI-Powered
             </div>
 
             {/* Headline */}
@@ -269,7 +269,7 @@ export default function LandingPage() {
             <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
               Afrikintel monitors your websites, services, and servers with smart alert dedup,
               AI-assisted postmortems, anomaly detection, and incident correlation.
-              Self-hostable. Open architecture. Built for ops teams.
+              Self-hostable when you need control. Hosted when you want us to run it. Built for ops teams.
             </p>
 
             {/* CTAs */}
@@ -282,13 +282,11 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <a
-                href="https://github.com/NewAfrikwave/afrikintel"
-                target="_blank"
-                rel="noopener"
+                href="/pricing"
                 className="group h-11 px-6 rounded-md border border-border hover:bg-muted text-sm font-medium flex items-center justify-center gap-2 transition-all hover:scale-105 shimmer-border"
               >
                 <Server className="w-4 h-4 text-emerald-400" />
-                Self-Host (Free)
+                Buy Self-hosted License
               </a>
             </div>
           </motion.div>
@@ -675,13 +673,11 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
               </Link>
               <a
-                href="https://github.com/NewAfrikwave/afrikintel"
-                target="_blank"
-                rel="noopener"
+                href="/pricing"
                 className="h-11 px-6 rounded-md border border-border hover:bg-muted text-sm font-medium flex items-center justify-center gap-2 transition-all hover:scale-105 text-foreground"
               >
                 <Server className="w-4 h-4 text-emerald-400" />
-                Self-Host (Free)
+                Buy Self-hosted License
               </a>
             </div>
           </motion.div>
@@ -694,7 +690,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-2.5">
             <img src="/logo.svg" alt="Afrikintel" className="w-7 h-7" />
             <span className="text-sm font-semibold text-foreground">Afrikintel</span>
-            <span className="text-xs text-muted-foreground ml-2">© 2024 · MIT Licensed</span>
+            <span className="text-xs text-muted-foreground ml-2">© 2024 · Commercial licenses available</span>
           </div>
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <a href="#features" className="nav-link hover:text-foreground">Features</a>
