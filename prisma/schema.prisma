@@ -55,6 +55,7 @@ model User {
   updatedAt DateTime @updatedAt
   accounts  Account[]
   subscriptions Subscription[]
+  purchases Purchase[]
 }
 
 model Account {
@@ -94,6 +95,31 @@ model Subscription {
   user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+  @@index([status])
+}
+
+model Purchase {
+  id            String    @id @default(cuid())
+  email         String?
+  userId        String?
+  plan          String
+  offerKind     String    // license | ltd
+  status        String    @default("paid")
+  monitorLimit  Int?
+  lsOrderId     String?   @unique
+  lsCustomerId  String?
+  lsVariantId   String?
+  amountCents   Int?
+  currency      String?
+  purchasedAt   DateTime  @default(now())
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([email])
+  @@index([plan])
+  @@index([offerKind])
   @@index([status])
 }
 

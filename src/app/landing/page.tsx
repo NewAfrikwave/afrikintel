@@ -64,17 +64,17 @@ const features = [
 
 const plans = [
   {
-    name: 'Self-Hosted',
-    price: '$0',
-    period: 'forever',
-    description: 'Run it on your own infrastructure. MIT licensed, all features.',
-    features: ['Unlimited monitors', 'All 5 AI features', '8 notification channels', 'Public status page', 'Server agents (Go/Bash/Python)', 'Community support'],
-    cta: 'Deploy Now',
-    href: 'https://github.com/NewAfrikwave/afrikintel',
+    name: 'AppSumo Tier 1',
+    price: '$59',
+    period: 'lifetime',
+    description: 'Hosted lifetime access for the launch cohort.',
+    features: ['50 hosted monitors', 'Smart alert dedup', 'AI postmortems', 'Multi-region checks', 'Hosted updates included'],
+    cta: 'View LTD',
+    href: '/appsumo',
     highlighted: false,
   },
   {
-    name: 'Pro',
+    name: 'Hosted Pro',
     price: '$19',
     period: '/month',
     description: 'We host it, you monitor. For teams that want convenience.',
@@ -84,12 +84,12 @@ const plans = [
     highlighted: true,
   },
   {
-    name: 'Business',
-    price: '$79',
-    period: '/month',
-    description: 'For larger teams with more infrastructure to watch.',
-    features: ['200 monitors', 'All 5 AI features', '8 notification channels', 'Multi-region checks', '30-second check intervals', 'Priority support', 'Team seats (10)', 'SSO ready'],
-    cta: 'Start Free Trial',
+    name: 'Self-hosted Team',
+    price: '$249',
+    period: 'one-time',
+    description: 'Run Afrikintel on your own infrastructure with support.',
+    features: ['Up to 5 instances', '12 months of updates', 'Commercial use', 'Email support', 'Portable deployment docs'],
+    cta: 'Buy License',
     href: '/pricing',
     highlighted: false,
   },
@@ -194,6 +194,7 @@ export default function LandingPage() {
             <a href="#features" className="nav-link hover:text-foreground transition-colors">Features</a>
             <a href="#how-it-works" className="nav-link hover:text-foreground transition-colors">How it works</a>
             <a href="#pricing" className="nav-link hover:text-foreground transition-colors">Pricing</a>
+            <Link href="/appsumo" className="nav-link hover:text-foreground transition-colors">AppSumo</Link>
             <a href="https://github.com/NewAfrikwave/afrikintel" target="_blank" rel="noopener" className="nav-link hover:text-foreground transition-colors">GitHub</a>
           </div>
           <div className="flex items-center gap-2">
@@ -579,11 +580,10 @@ export default function LandingPage() {
               Pricing
             </div>
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-3">
-              Free to self-host. <span className="gradient-text">Pay for convenience.</span>
+              Launch deal first. <span className="gradient-text">SaaS revenue next.</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              The self-hosted version is fully featured and MIT licensed. No paywalling.
-              Pay only if you want us to host it.
+              Afrikintel is priced for an AppSumo cash injection, recurring hosted SaaS, and a secondary self-hosted license channel.
             </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">
@@ -640,7 +640,7 @@ export default function LandingPage() {
           </div>
           <div className="text-center mt-8">
             <p className="text-xs text-muted-foreground">
-              All plans include: 6 monitor types · 8 notification channels · public status page · multi-region checks
+              All offers include: 6 monitor types · 8 notification channels · public status page · multi-region checks
             </p>
           </div>
         </div>
@@ -699,6 +699,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <a href="#features" className="nav-link hover:text-foreground">Features</a>
             <a href="#pricing" className="nav-link hover:text-foreground">Pricing</a>
+            <a href="/appsumo" className="nav-link hover:text-foreground">AppSumo</a>
             <a href="https://github.com/NewAfrikwave/afrikintel" target="_blank" rel="noopener" className="nav-link hover:text-foreground">GitHub</a>
             <a href="/demo" className="nav-link hover:text-foreground">Demo</a>
           </div>

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth/auth-options'
-import { createPlanCheckout, type BillingPlan } from '@/lib/lemonsqueezy'
+import { billingOffers, createPlanCheckout, type BillingPlan } from '@/lib/lemonsqueezy'
 import { checkRateLimit } from '@/lib/rate-limit'
 
-const plans = new Set(['pro', 'business'])
+const plans = new Set(Object.keys(billingOffers))
 
 export async function POST(req: NextRequest) {
   const limited = await checkRateLimit(req, 'checkout')

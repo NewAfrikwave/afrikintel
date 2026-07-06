@@ -30,6 +30,10 @@ LEMONSQUEEZY_WEBHOOK_SECRET="webhook-secret"
 LS_STORE_ID="lemon-squeezy-store-id"
 LS_PRO_VARIANT_ID="pro-variant-id"
 LS_BUSINESS_VARIANT_ID="business-variant-id"
+LS_SELF_HOSTED_PERSONAL_VARIANT_ID="self-hosted-personal-variant-id"
+LS_SELF_HOSTED_TEAM_VARIANT_ID="self-hosted-team-variant-id"
+LS_APPSUMO_TIER1_VARIANT_ID="appsumo-tier-1-variant-id"
+LS_APPSUMO_TIER2_VARIANT_ID="appsumo-tier-2-variant-id"
 CHECK_REGIONS="us-east,eu-west,ap-southeast"
 ```
 
@@ -48,4 +52,5 @@ SENTRY_TRACES_SAMPLE_RATE="0.1"
 2. Set the GitHub OAuth callback to `https://afrikintel.com/api/auth/callback/github`.
 3. Set the Lemon Squeezy webhook URL to `https://afrikintel.com/api/lemonsqueezy/webhook`.
 4. Run `bun run seed:demo` against the production database once to create the reviewer account.
-5. Verify `/landing`, `/pricing`, `/demo`, `/dashboard`, and `/api/engine`.
+5. Verify `/landing`, `/appsumo`, `/pricing`, `/demo`, `/dashboard`, and `/api/engine`.
+6. Test one checkout for each active offer family: AppSumo LTD, hosted SaaS, and self-hosted license.
