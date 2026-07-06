@@ -4,7 +4,7 @@ import { useAppStore } from '@/lib/store'
 import { cn } from '@/lib/utils'
 import type { ViewKey } from '@/lib/types'
 import { useSession } from 'next-auth/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useSyncExternalStore } from 'react'
 import {
   LayoutDashboard, Activity, AlertTriangle, Bell, Users, Globe, Settings,
   ChevronLeft, ChevronRight, Zap, ShieldCheck, LogIn, Menu, X,
@@ -36,6 +36,8 @@ export function Sidebar({ onLoginClick }: { onLoginClick?: () => void }) {
   const toggleSidebar = useAppStore((s) => s.toggleSidebar)
   const liveStats = useAppStore((s) => s.liveStats)
   const { data: session } = useSession()
+  const hydrated = useHydrated()
+  const displaySession = hydrated ? session : null
   const [mobileOpen, setMobileOpen] = useState(false)
 
   // Close mobile sidebar on view change (deferred to avoid cascading renders)
@@ -167,16 +169,16 @@ export function Sidebar({ onLoginClick }: { onLoginClick?: () => void }) {
       {/* User card / login */}
       {!collapsed && (
         <div className="px-3 py-3 border-t border-sidebar-border">
-          {session ? (
+          {displaySession ? (
             <div className="flex items-center gap-3 px-2 py-2 rounded-md hover:bg-sidebar-accent/50 transition-colors">
               <UserMenu />
               <div className="flex-1 min-w-0">
                 <div className="text-xs font-medium text-foreground truncate">
-                  {(session.user as any).name || (session.user as any).email}
+                  {(displaySession.user as any).name || (displaySession.user as any).email}
                 </div>
                 <div className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
                   <ShieldCheck className="w-3 h-3 text-emerald-500" />
-                  {(session.user as any).role || 'viewer'}
+                  {(displaySession.user as any).role || 'viewer'}
                 </div>
               </div>
             </div>
@@ -196,7 +198,7 @@ export function Sidebar({ onLoginClick }: { onLoginClick?: () => void }) {
           )}
         </div>
       )}
-      {collapsed && !session && (
+      {collapsed && !displaySession && (
         <div className="px-3 py-3 border-t border-sidebar-border flex justify-center">
           <button
             onClick={onLoginClick}
@@ -207,7 +209,7 @@ export function Sidebar({ onLoginClick }: { onLoginClick?: () => void }) {
           </button>
         </div>
       )}
-      {collapsed && session && (
+      {collapsed && displaySession && (
         <div className="px-3 py-3 border-t border-sidebar-border flex justify-center">
           <UserMenu />
         </div>
@@ -259,4 +261,13 @@ export function Sidebar({ onLoginClick }: { onLoginClick?: () => void }) {
       )}
     </>
   )
+}
+
+function subscribeHydration(onStoreChange: () => void) {
+  const id = window.setTimeout(onStoreChange, 0)
+  return () => window.clearTimeout(id)
+}
+
+function useHydrated() {
+  return useSyncExternalStore(subscribeHydration, () => true, () => false)
 }
