@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { MarketingFooter } from '@/components/marketing/MarketingFooter'
 import {
   ArrowRight,
   CheckCircle2,
@@ -125,6 +126,7 @@ export default function AppSumoPage() {
           </ul>
         </section>
       </div>
+      <MarketingFooter />
     </main>
   )
 }

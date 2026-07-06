@@ -5,6 +5,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef, useEffect, useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { cn } from '@/lib/utils'
+import { MarketingFooter } from '@/components/marketing/MarketingFooter'
 import {
   Zap, ShieldCheck, GitBranch, Sparkles, Activity, Globe, Bell, Server,
   ArrowRight, Check, TrendingUp, AlertTriangle, Clock, Cpu, Database,
@@ -684,23 +685,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-8 relative">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <img src="/logo.svg" alt="Afrikintel" className="w-7 h-7" />
-            <span className="text-sm font-semibold text-foreground">Afrikintel</span>
-            <span className="text-xs text-muted-foreground ml-2">© 2024 · Commercial licenses available</span>
-          </div>
-          <div className="flex items-center gap-4 text-xs text-muted-foreground">
-            <a href="#features" className="nav-link hover:text-foreground">Features</a>
-            <a href="#pricing" className="nav-link hover:text-foreground">Pricing</a>
-            <a href="/appsumo" className="nav-link hover:text-foreground">AppSumo</a>
-            <a href="https://github.com/NewAfrikwave/afrikintel" target="_blank" rel="noopener" className="nav-link hover:text-foreground">GitHub</a>
-            <a href="/demo" className="nav-link hover:text-foreground">Demo</a>
-          </div>
-        </div>
-      </footer>
+      <MarketingFooter />
     </div>
   )
 }

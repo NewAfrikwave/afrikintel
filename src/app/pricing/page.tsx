@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { MarketingFooter } from '@/components/marketing/MarketingFooter'
 
 type PricingOffer = {
   id: string
@@ -218,6 +219,7 @@ export default function PricingPage() {
           </div>
         </section>
       </div>
+      <MarketingFooter />
     </main>
   )
 }
