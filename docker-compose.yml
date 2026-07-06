@@ -1,0 +1,95 @@
+# ============================================================
+# Afrikintel — Docker Compose (production)
+# Usage: docker-compose up -d
+# ============================================================
+version: '3.8'
+
+services:
+  # Main app (Next.js + monitor-service)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: afrikintel-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      # Database
+      DATABASE_URL: "postgresql://afrikintel:${DB_PASSWORD:-afrikintel_password}@db:5432/afrikintel?schema=public"
+      
+      # Auth
+      NEXTAUTH_SECRET: "${NEXTAUTH_SECRET:-change_me_to_a_random_string}"
+      NEXTAUTH_URL: "${NEXTAUTH_URL:-http://localhost:3000}"
+      
+      # GitHub OAuth (optional)
+      GITHUB_ID: "${GITHUB_ID:-}"
+      GITHUB_SECRET: "${GITHUB_SECRET:-}"
+      
+      # Email (SMTP)
+      SMTP_HOST: "${SMTP_HOST:-}"
+      SMTP_PORT: "${SMTP_PORT:-587}"
+      SMTP_USER: "${SMTP_USER:-}"
+      SMTP_PASS: "${SMTP_PASS:-}"
+      SMTP_FROM: "${SMTP_FROM:-alerts@afrikintel.com}"
+      
+      # Twilio SMS (optional)
+      TWILIO_SID: "${TWILIO_SID:-}"
+      TWILIO_TOKEN: "${TWILIO_TOKEN:-}"
+      TWILIO_FROM: "${TWILIO_FROM:-}"
+      
+      # Multi-region
+      CHECK_REGIONS: "${CHECK_REGIONS:-us-east,eu-west,ap-southeast}"
+      
+      # Lemon Squeezy billing (optional)
+      LEMONSQUEEZY_API_KEY: "${LEMONSQUEEZY_API_KEY:-}"
+      LEMONSQUEEZY_WEBHOOK_SECRET: "${LEMONSQUEEZY_WEBHOOK_SECRET:-}"
+      LS_STORE_ID: "${LS_STORE_ID:-}"
+      LS_PRO_VARIANT_ID: "${LS_PRO_VARIANT_ID:-}"
+      LS_BUSINESS_VARIANT_ID: "${LS_BUSINESS_VARIANT_ID:-}"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - app_data:/app/db
+    networks:
+      - afrikintel-net
+
+  # PostgreSQL database
+  db:
+    image: postgres:16-alpine
+    container_name: afrikintel-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: afrikintel
+      POSTGRES_USER: afrikintel
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-afrikintel_password}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U afrikintel -d afrikintel"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - afrikintel-net
+
+  # Optional: Redis for rate limiting (uncomment if using @upstash/ratelimit locally)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: afrikintel-redis
+  #   restart: unless-stopped
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - afrikintel-net
+
+volumes:
+  pgdata:
+  app_data:
+
+networks:
+  afrikintel-net:
+    driver: bridge

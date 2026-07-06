@@ -1,0 +1,375 @@
+// ============================================================
+// Afrikintel - PostgreSQL Schema Variant
+// ============================================================
+// To switch from SQLite to PostgreSQL:
+//
+// 1. Install PostgreSQL on your host (or use a managed service like
+//    Supabase, Neon, Railway, or RDS).
+//
+// 2. Create a database and user:
+//    CREATE DATABASE afrikintel;
+//    CREATE USER afrikintel WITH PASSWORD 'your-password';
+//    GRANT ALL PRIVILEGES ON DATABASE afrikintel TO afrikintel;
+//
+// 3. Update prisma/schema.prisma:
+//    - Change `provider = "sqlite"` to `provider = "postgresql"`
+//    - (Optionally) replace the entire file with this content
+//
+// 4. Set DATABASE_URL in .env:
+//    DATABASE_URL="postgresql://afrikintel:password@localhost:5432/afrikintel?schema=public"
+//
+// 5. Run: bun run db:push
+//
+// 6. Restart Afrikintel. All data will be migrated to PostgreSQL.
+//
+// Benefits of PostgreSQL over SQLite:
+// - Concurrent writes (multiple check workers)
+// - Better performance at scale (>100 monitors, >1 check/sec)
+// - Built-in JSON operators for advanced metric queries
+// - Native full-text search for incident descriptions
+// - Point-in-time recovery with PITR backups
+// - Read replicas for dashboard-heavy loads
+//
+// Note: The schema below is identical to schema.prisma except for the datasource provider.
+// The Prisma client works the same way regardless of provider.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String?  // nullable for OAuth-only users
+  role      String   @default("viewer") // admin | editor | viewer
+  avatar    String?
+  active    Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  accounts  Account[]
+  subscriptions Subscription[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String   // github | google | credentials
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Subscription {
+  id               String    @id @default(cuid())
+  userId           String
+  plan             String    @default("free") // free | pro | business
+  status           String    @default("active") // active | cancelled | expired | past_due | paused
+  lsCustomerId     String?
+  lsSubscriptionId String?   @unique
+  lsVariantId      String?
+  currentPeriodEnd DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Monitor {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   // website | service | server | ping | dns | blacklist
+  target        String
+  port          Int?
+  interval      Int      @default(60)
+  timeout       Int      @default(30)
+  enabled       Boolean  @default(true)
+  paused        Boolean  @default(false)
+
+  status        String   @default("pending")
+  uptime        Float    @default(100)
+  responseTime  Int?
+  lastChecked   DateTime?
+  lastDownAt    DateTime?
+  consecutiveFailures Int @default(0)
+
+  thresholdResponseTime Int @default(2000)
+  thresholdRetries      Int @default(2)
+  thresholdCpu          Float @default(85)
+  thresholdRam          Float @default(85)
+  thresholdDisk         Float @default(90)
+
+  public       Boolean  @default(true)
+  order        Int      @default(0)
+
+  description  String?
+  tags         String?
+  region       String?
+  checkRegions String?  // comma-separated list of regions to check from
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  checks       Check[]
+  incidents    Incident[]
+  metrics      ServerMetric[]
+  anomalyAlerts AnomalyAlert[]
+
+  @@index([status])
+  @@index([type])
+}
+
+model Check {
+  id           String   @id @default(cuid())
+  monitorId    String
+  status       String
+  responseTime Int?
+  statusCode   Int?
+  errorMessage String?
+  latency      Float?
+  region       String?
+  metadata     Json?
+  checkedAt    DateTime @default(now())
+
+  monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, checkedAt])
+  @@index([region, checkedAt])
+}
+
+model ServerMetric {
+  id           String   @id @default(cuid())
+  monitorId    String
+  cpuUsage     Float
+  cpuCores     Int      @default(1)
+  ramTotal     Float
+  ramUsed      Float
+  ramUsage     Float
+  diskTotal    Float
+  diskUsed     Float
+  diskUsage    Float
+  networkIn    Float
+  networkOut   Float
+  loadAvg1     Float?
+  loadAvg5     Float?
+  loadAvg15    Float?
+  uptime       Float?
+  processes    Int?
+  temperature  Float?
+  metadata     Json?
+  recordedAt   DateTime @default(now())
+
+  monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, recordedAt])
+}
+
+model Incident {
+  id          String   @id @default(cuid())
+  monitorId   String
+  status      String   @default("open")
+  severity    String   @default("warning")
+  title       String
+  description String?
+  startedAt   DateTime @default(now())
+  resolvedAt  DateTime?
+  duration    Int?
+
+  monitor     Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  updates     IncidentUpdate[]
+
+  @@index([status])
+  @@index([startedAt])
+}
+
+model IncidentUpdate {
+  id          String   @id @default(cuid())
+  incidentId  String
+  status      String
+  message     String
+  author      String?
+  createdAt   DateTime @default(now())
+
+  incident    Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+}
+
+model NotificationChannel {
+  id          String   @id @default(cuid())
+  type        String
+  name        String
+  config      Json
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model NotificationLog {
+  id          String   @id @default(cuid())
+  channelId   String?
+  channelName String
+  incidentId  String?
+  monitorId   String?
+  message     String
+  status      String
+  error       String?
+  sentAt      DateTime @default(now())
+
+  @@index([sentAt])
+}
+
+model Setting {
+  id    String @id
+  key   String @unique
+  value String
+}
+
+model StatusPage {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?
+  logo        String?
+  theme       String   @default("dark")
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================================
+// Advanced features
+// ============================================================
+
+model AnomalyAlert {
+  id          String   @id @default(cuid())
+  monitorId   String
+  metric      String
+  value       Float
+  baseline    Float
+  zScore      Float
+  severity    String
+  status      String   @default("open")
+  message     String
+  detectedAt  DateTime @default(now())
+  resolvedAt  DateTime?
+
+  monitor     Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, detectedAt])
+  @@index([status])
+}
+
+model IncidentGroup {
+  id                  String   @id @default(cuid())
+  status              String   @default("open")
+  severity            String   @default("warning")
+  title               String
+  rootCauseHypothesis String?
+  startedAt           DateTime @default(now())
+  resolvedAt          DateTime?
+  incidentIds         String
+  monitorIds          String
+  count               Int      @default(1)
+  correlationScore    Float    @default(0)
+
+  @@index([status])
+  @@index([startedAt])
+}
+
+model Postmortem {
+  id                  String   @id @default(cuid())
+  incidentId          String   @unique
+  summary             String
+  timeline            String
+  rootCause           String
+  contributingFactors String
+  impact              String
+  actionItems         String
+  generatedAt         DateTime @default(now())
+  regeneratedAt       DateTime?
+  model               String   @default("glm-4")
+}
+
+model Journey {
+  id               String       @id @default(cuid())
+  name             String
+  description      String?
+  enabled          Boolean      @default(true)
+  interval         Int          @default(300)
+  timeout          Int          @default(60)
+  public           Boolean      @default(false)
+  status           String       @default("pending")
+  lastChecked      DateTime?
+  lastResponseTime Int?
+  uptime           Float        @default(100)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  steps            JourneyStep[]
+  runs             JourneyRun[]
+}
+
+model JourneyStep {
+  id          String  @id @default(cuid())
+  journeyId   String
+  order       Int
+  action      String
+  target      String
+  value       String?
+  description String?
+
+  journey     Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+
+  @@index([journeyId, order])
+}
+
+model JourneyRun {
+  id           String   @id @default(cuid())
+  journeyId    String
+  status       String
+  responseTime Int?
+  errorMessage String?
+  stepResults  String?
+  checkedAt    DateTime @default(now())
+
+  journey      Journey  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+
+  @@index([journeyId, checkedAt])
+}
+
+model AlertDedup {
+  id          String   @id @default(cuid())
+  fingerprint String   @unique
+  monitorId   String?
+  incidentId  String?
+  issueType   String
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  count       Int      @default(1)
+  suppressed  Int      @default(0)
+  status      String   @default("active")
+  nextAlertAt DateTime?
+
+  @@index([fingerprint])
+  @@index([status])
+}

@@ -1,0 +1,14 @@
+{
+  "name": "nmon-monitor-service",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot index.ts",
+    "start": "bun index.ts",
+    "postinstall": "node -e \"const fs=require('fs');const path=require('path');try{fs.mkdirSync(path.join('node_modules','.prisma'),{recursive:true});fs.cpSync(path.join('..','..','node_modules','.prisma','client'),path.join('node_modules','.prisma','client'),{recursive:true});fs.cpSync(path.join('..','..','node_modules','@prisma','client'),path.join('node_modules','@prisma','client'),{recursive:true});console.log('Prisma client copied from parent');}catch(e){console.log('Could not copy prisma client:',e.message);}\" && node -e \"const fs=require('fs');if(!fs.existsSync('.env')){fs.writeFileSync('.env','DATABASE_URL=\\\"file:/home/z/my-project/db/custom.db\\\"\\n');console.log('Created .env');}\""
+  },
+  "dependencies": {
+    "socket.io": "^4.8.1",
+    "@prisma/client": "^6.11.1"
+  }
+}

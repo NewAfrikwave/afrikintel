@@ -1,0 +1,341 @@
+// nMon Advanced - Monitoring Platform Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String?  // nullable for OAuth-only users
+  role      String   @default("viewer") // admin | editor | viewer
+  avatar    String?
+  active    Boolean  @default(true)
+  lastLogin DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  accounts  Account[]
+  subscriptions Subscription[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  provider          String   // github | google | credentials
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Subscription {
+  id               String    @id @default(cuid())
+  userId           String
+  plan             String    @default("free") // free | pro | business
+  status           String    @default("active") // active | cancelled | expired | past_due | paused
+  lsCustomerId     String?
+  lsSubscriptionId String?   @unique
+  lsVariantId      String?
+  currentPeriodEnd DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+}
+
+model Monitor {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   // website | service | server | ping | dns | blacklist
+  target        String   // URL / host:port / IP / hostname
+  port          Int?
+  interval      Int      @default(60) // seconds
+  timeout       Int      @default(30) // seconds
+  enabled       Boolean  @default(true)
+  paused        Boolean  @default(false)
+
+  // Last known status
+  status        String   @default("pending") // up | down | degraded | pending
+  uptime        Float    @default(100) // percentage over last 24h
+  responseTime  Int?
+  lastChecked   DateTime?
+  lastDownAt    DateTime?
+  consecutiveFailures Int @default(0)
+
+  // Thresholds
+  thresholdResponseTime Int @default(2000) // ms
+  thresholdRetries      Int @default(2)
+  thresholdCpu          Float @default(85)
+  thresholdRam          Float @default(85)
+  thresholdDisk         Float @default(90)
+
+  // Public status page visibility
+  public       Boolean  @default(true)
+  order        Int      @default(0)
+
+  description  String?
+  tags         String?  // comma separated
+  region       String?  // primary region label
+  checkRegions String?  // comma-separated list of regions to check from (e.g. "us-east,eu-west")
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  checks       Check[]
+  incidents    Incident[]
+  metrics      ServerMetric[]
+  anomalyAlerts AnomalyAlert[]
+  anomalies    AnomalyAlert[]
+}
+
+model Check {
+  id           String   @id @default(cuid())
+  monitorId    String
+  status       String   // up | down | degraded
+  responseTime Int?
+  statusCode   Int?
+  errorMessage String?
+  latency      Float?
+  region       String?  // which region performed this check
+  metadata     String?  // JSON
+  checkedAt    DateTime @default(now())
+
+  monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, checkedAt])
+  @@index([region, checkedAt])
+}
+
+model ServerMetric {
+  id           String   @id @default(cuid())
+  monitorId    String
+  cpuUsage     Float
+  cpuCores     Int      @default(1)
+  ramTotal     Float    // GB
+  ramUsed      Float    // GB
+  ramUsage     Float    // percentage
+  diskTotal    Float    // GB
+  diskUsed     Float    // GB
+  diskUsage    Float    // percentage
+  networkIn    Float    // KB/s
+  networkOut   Float    // KB/s
+  loadAvg1     Float?
+  loadAvg5     Float?
+  loadAvg15    Float?
+  uptime       Float?   // seconds
+  processes    Int?
+  temperature  Float?
+  metadata     String?  // JSON for per-disk / per-core
+  recordedAt   DateTime @default(now())
+
+  monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, recordedAt])
+}
+
+model Incident {
+  id          String   @id @default(cuid())
+  monitorId   String
+  status      String   @default("open") // open | acknowledged | resolved
+  severity    String   @default("warning") // critical | warning | info
+  title       String
+  description String?
+  startedAt   DateTime @default(now())
+  resolvedAt  DateTime?
+  duration    Int?     // seconds
+
+  monitor     Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  updates     IncidentUpdate[]
+
+  @@index([status])
+  @@index([startedAt])
+}
+
+model IncidentUpdate {
+  id          String   @id @default(cuid())
+  incidentId  String
+  status      String
+  message     String
+  author      String?
+  createdAt   DateTime @default(now())
+
+  incident    Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+}
+
+model NotificationChannel {
+  id          String   @id @default(cuid())
+  type        String   // email | sms | webhook | pushbullet | pushover | twitter | slack | discord
+  name        String
+  config      String   // JSON
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model NotificationLog {
+  id          String   @id @default(cuid())
+  channelId   String?
+  channelName String
+  incidentId  String?
+  monitorId   String?
+  message     String
+  status      String   // sent | failed | pending
+  error       String?
+  sentAt      DateTime @default(now())
+}
+
+model Setting {
+  id    String @id
+  key   String @unique
+  value String
+}
+
+model StatusPage {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?
+  logo        String?
+  theme       String   @default("dark")
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================================
+// Tier 3 - Advanced features
+// ============================================================
+
+model AnomalyAlert {
+  id          String   @id @default(cuid())
+  monitorId   String
+  metric      String   // responseTime | cpuUsage | ramUsage | diskUsage
+  value       Float    // observed value
+  baseline    Float    // EWMA baseline
+  zScore      Float    // standard deviations from baseline
+  severity    String   // warning | critical
+  status      String   @default("open") // open | acknowledged | resolved
+  message     String
+  detectedAt  DateTime @default(now())
+  resolvedAt  DateTime?
+
+  monitor     Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+
+  @@index([monitorId, detectedAt])
+  @@index([status])
+}
+
+model IncidentGroup {
+  id          String   @id @default(cuid())
+  status      String   @default("open") // open | resolved
+  severity    String   @default("warning")
+  title       String
+  rootCauseHypothesis String?
+  startedAt   DateTime @default(now())
+  resolvedAt  DateTime?
+  incidentIds String   // comma-separated list of Incident IDs in this group
+  monitorIds  String   // comma-separated list of Monitor IDs affected
+  count       Int      @default(1)
+  correlationScore Float @default(0) // 0-1, how strongly correlated
+
+  @@index([status])
+  @@index([startedAt])
+}
+
+model Postmortem {
+  id          String   @id @default(cuid())
+  incidentId  String   @unique
+  summary     String
+  timeline    String   // markdown
+  rootCause   String   // markdown
+  contributingFactors String
+  impact      String
+  actionItems String   // markdown list
+  generatedAt DateTime @default(now())
+  regeneratedAt DateTime?
+  model       String   @default("glm-4")
+}
+
+model Journey {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  enabled     Boolean  @default(true)
+  interval    Int      @default(300) // seconds between runs
+  timeout     Int      @default(60)
+  public      Boolean  @default(false)
+  status      String   @default("pending") // up | down | degraded | pending
+  lastChecked DateTime?
+  lastResponseTime Int?
+  uptime      Float    @default(100)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  steps       JourneyStep[]
+  runs        JourneyRun[]
+}
+
+model JourneyStep {
+  id          String   @id @default(cuid())
+  journeyId   String
+  order       Int
+  action      String   // navigate | click | type | wait | assert | screenshot
+  target      String   // URL for navigate, CSS selector for click/type, text for assert
+  value       String?  // text to type, expected value for assert
+  description String?
+
+  journey     Journey  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+
+  @@index([journeyId, order])
+}
+
+model JourneyRun {
+  id          String   @id @default(cuid())
+  journeyId   String
+  status      String   // up | down | degraded
+  responseTime Int?
+  errorMessage String?
+  stepResults String?  // JSON array of {stepId, status, duration, error}
+  checkedAt   DateTime @default(now())
+
+  journey     Journey  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+
+  @@index([journeyId, checkedAt])
+}
+
+model AlertDedup {
+  id          String   @id @default(cuid())
+  fingerprint String   @unique // hash of monitorId + issueType
+  monitorId   String?
+  incidentId  String?
+  issueType   String   // down | degraded | threshold | anomaly
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  count       Int      @default(1)
+  suppressed  Int      @default(0) // number of alerts suppressed
+  status      String   @default("active") // active | resolved
+  nextAlertAt DateTime? // when to send next alert (rate limiting)
+
+  @@index([fingerprint])
+  @@index([status])
+}
