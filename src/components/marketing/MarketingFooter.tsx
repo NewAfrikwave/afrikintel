@@ -5,6 +5,7 @@ const navLinks: Array<{ label: string; href: string; external?: boolean }> = [
   { label: 'Pricing', href: '/pricing' },
   { label: 'AppSumo', href: '/appsumo' },
   { label: 'Demo', href: '/demo' },
+  { label: 'Redeem', href: '/redeem' },
   { label: 'Docs', href: '/docs' },
   { label: 'Install', href: '/docs/install' },
   { label: 'Status', href: '/status' },
