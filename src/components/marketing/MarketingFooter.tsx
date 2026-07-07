@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-const navLinks = [
+const navLinks: Array<{ label: string; href: string; external?: boolean }> = [
   { label: 'Features', href: '/landing#features' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'AppSumo', href: '/appsumo' },
@@ -18,7 +18,7 @@ export function MarketingFooter() {
         <Link href="/landing" className="flex items-center gap-2.5">
           <img src="/logo.svg" alt="Afrikintel" className="h-7 w-7" />
           <span className="text-sm font-semibold text-foreground">Afrikintel</span>
-          <span className="text-xs text-muted-foreground">© 2026 · Commercial licenses available</span>
+          <span className="text-xs text-muted-foreground">Copyright 2026 Afrikintel. Commercial licenses available.</span>
         </Link>
 
         <nav className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground">

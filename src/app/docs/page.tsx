@@ -26,7 +26,7 @@ const quickStart = [
   },
   {
     title: 'Configure secrets',
-    body: 'Set auth, SMTP, Lemon Squeezy, and optional GitHub OAuth variables before launch.',
+    body: 'Set auth, SMTP, Stripe, and optional GitHub OAuth variables before launch.',
     icon: KeyRound,
   },
   {
@@ -40,15 +40,14 @@ const requiredVars = [
   'DATABASE_URL',
   'NEXTAUTH_SECRET',
   'NEXTAUTH_URL',
-  'LEMONSQUEEZY_API_KEY',
-  'LEMONSQUEEZY_WEBHOOK_SECRET',
-  'LS_STORE_ID',
-  'LS_PRO_VARIANT_ID',
-  'LS_BUSINESS_VARIANT_ID',
-  'LS_SELF_HOSTED_PERSONAL_VARIANT_ID',
-  'LS_SELF_HOSTED_TEAM_VARIANT_ID',
-  'LS_APPSUMO_TIER1_VARIANT_ID',
-  'LS_APPSUMO_TIER2_VARIANT_ID',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET',
+  'STRIPE_PRO_PRICE_ID',
+  'STRIPE_BUSINESS_PRICE_ID',
+  'STRIPE_SELF_HOSTED_PERSONAL_PRICE_ID',
+  'STRIPE_SELF_HOSTED_TEAM_PRICE_ID',
+  'STRIPE_APPSUMO_TIER1_PRICE_ID',
+  'STRIPE_APPSUMO_TIER2_PRICE_ID',
 ]
 
 const optionalVars = ['GITHUB_ID', 'GITHUB_SECRET', 'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM']
@@ -119,7 +118,7 @@ export default function DocsPage() {
             <ol className="mt-5 space-y-4 text-sm text-muted-foreground">
               <DocStep title="Create Railway services" body="Use one web service from the GitHub repo plus the Railway PostgreSQL plugin. The Docker start script runs the app and monitor worker for the first launch." />
               <DocStep title="Set the public URL" body="Use NEXTAUTH_URL=https://afrikintel.com after the custom domain is connected." />
-              <DocStep title="Configure Lemon Squeezy" body="Create variants for SaaS, AppSumo LTD, and self-hosted licenses. Set the webhook URL to /api/lemonsqueezy/webhook." />
+              <DocStep title="Configure Stripe" body="Create products and prices for SaaS, AppSumo LTD, and self-hosted licenses. Set the webhook URL to /api/stripe/webhook." />
               <DocStep title="Seed and test the demo" body="The reviewer flow uses /demo and signs in as demo@afrikintel.com." />
             </ol>
           </article>
@@ -157,8 +156,8 @@ export default function DocsPage() {
               Billing endpoints
             </div>
             <div className="mt-4 space-y-3 text-sm">
-              <Endpoint method="POST" path="/api/checkout" body="Creates Lemon Squeezy checkouts for AppSumo LTDs, hosted SaaS, and self-hosted licenses." />
-              <Endpoint method="POST" path="/api/lemonsqueezy/webhook" body="Records subscription events and one-time purchase events." />
+              <Endpoint method="POST" path="/api/checkout" body="Creates Stripe checkouts for AppSumo LTDs, hosted SaaS, and self-hosted licenses." />
+              <Endpoint method="POST" path="/api/stripe/webhook" body="Records subscription events and one-time purchase events." />
             </div>
           </article>
 
@@ -169,7 +168,7 @@ export default function DocsPage() {
             </div>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>Open /landing, /appsumo, /pricing, /demo, /status, and /refund-policy.</li>
-              <li>Confirm checkout opens for each paid offer after variant IDs are set.</li>
+              <li>Confirm checkout opens for each paid offer after price IDs are set.</li>
               <li>Create a monitor and confirm checks appear in the dashboard.</li>
               <li>Test SMTP with a real alert channel before AppSumo submission.</li>
               <li>Scan Railway logs for Prisma, webhook, or runtime errors.</li>

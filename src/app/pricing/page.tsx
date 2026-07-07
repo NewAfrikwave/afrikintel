@@ -170,7 +170,7 @@ export default function PricingPage() {
 
         {licenseSuccess && (
           <div className="rounded-md border border-primary/40 bg-primary/10 px-4 py-3 text-sm text-primary">
-            Purchase complete. Check your Lemon Squeezy receipt for license and download details.
+            Purchase complete. Check your Stripe receipt for license and download details.
           </div>
         )}
 

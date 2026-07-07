@@ -62,7 +62,7 @@ Use at least five from `download/`:
 - Demo account seeded and tested.
 - GitHub OAuth callback points to production.
 - SMTP credentials configured.
-- Lemon Squeezy checkout and webhook configured for SaaS, AppSumo LTD, and self-hosted license variants.
+- Stripe checkout and webhook configured for SaaS, AppSumo LTD, and self-hosted license prices.
 - Railway PostgreSQL attached and schema pushed.
 - SSL active on `afrikintel.com`.
 - Screenshots uploaded.

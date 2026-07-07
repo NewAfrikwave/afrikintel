@@ -25,15 +25,15 @@ SMTP_PORT="587"
 SMTP_USER="alerts@afrikintel.com"
 SMTP_PASS="smtp-password"
 SMTP_FROM="alerts@afrikintel.com"
-LEMONSQUEEZY_API_KEY="live-or-test-api-key"
-LEMONSQUEEZY_WEBHOOK_SECRET="webhook-secret"
-LS_STORE_ID="lemon-squeezy-store-id"
-LS_PRO_VARIANT_ID="pro-variant-id"
-LS_BUSINESS_VARIANT_ID="business-variant-id"
-LS_SELF_HOSTED_PERSONAL_VARIANT_ID="self-hosted-personal-variant-id"
-LS_SELF_HOSTED_TEAM_VARIANT_ID="self-hosted-team-variant-id"
-LS_APPSUMO_TIER1_VARIANT_ID="appsumo-tier-1-variant-id"
-LS_APPSUMO_TIER2_VARIANT_ID="appsumo-tier-2-variant-id"
+STRIPE_SECRET_KEY="sk_live_or_test_key"
+STRIPE_WEBHOOK_SECRET="whsec_webhook_secret"
+STRIPE_AUTOMATIC_TAX="0"
+STRIPE_PRO_PRICE_ID="price_pro_monthly"
+STRIPE_BUSINESS_PRICE_ID="price_business_monthly"
+STRIPE_SELF_HOSTED_PERSONAL_PRICE_ID="price_self_hosted_personal"
+STRIPE_SELF_HOSTED_TEAM_PRICE_ID="price_self_hosted_team"
+STRIPE_APPSUMO_TIER1_PRICE_ID="price_appsumo_tier_1"
+STRIPE_APPSUMO_TIER2_PRICE_ID="price_appsumo_tier_2"
 CHECK_REGIONS="us-east,eu-west,ap-southeast"
 ```
 
@@ -50,7 +50,7 @@ SENTRY_TRACES_SAMPLE_RATE="0.1"
 
 1. Add the custom domain `afrikintel.com` in Railway and point DNS to Railway.
 2. Set the GitHub OAuth callback to `https://afrikintel.com/api/auth/callback/github`.
-3. Set the Lemon Squeezy webhook URL to `https://afrikintel.com/api/lemonsqueezy/webhook`.
+3. Set the Stripe webhook URL to `https://afrikintel.com/api/stripe/webhook`.
 4. Run `bun run seed:demo` against the production database once to create the reviewer account.
 5. Verify `/landing`, `/appsumo`, `/pricing`, `/demo`, `/dashboard`, and `/api/engine`.
 6. Test one checkout for each active offer family: AppSumo LTD, hosted SaaS, and self-hosted license.

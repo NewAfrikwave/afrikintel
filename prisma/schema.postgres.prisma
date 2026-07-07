@@ -43,32 +43,32 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String?  // nullable for OAuth-only users
-  role      String   @default("viewer") // admin | editor | viewer
-  avatar    String?
-  active    Boolean  @default(true)
-  lastLogin DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  accounts  Account[]
+  id            String         @id @default(cuid())
+  email         String         @unique
+  name          String
+  password      String? // nullable for OAuth-only users
+  role          String         @default("viewer") // admin | editor | viewer
+  avatar        String?
+  active        Boolean        @default(true)
+  lastLogin     DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  accounts      Account[]
   subscriptions Subscription[]
-  purchases Purchase[]
+  purchases     Purchase[]
 }
 
 model Account {
   id                String  @id @default(cuid())
   userId            String
-  provider          String   // github | google | credentials
+  provider          String // github | google | credentials
   providerAccountId String
   refresh_token     String?
   access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -77,45 +77,53 @@ model VerificationToken {
   identifier String
   token      String
   expires    DateTime
+
   @@unique([identifier, token])
 }
 
 model Subscription {
-  id               String    @id @default(cuid())
-  userId           String
-  plan             String    @default("free") // free | pro | business
-  status           String    @default("active") // active | cancelled | expired | past_due | paused
-  lsCustomerId     String?
-  lsSubscriptionId String?   @unique
-  lsVariantId      String?
-  currentPeriodEnd DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id                   String    @id @default(cuid())
+  userId               String
+  plan                 String    @default("free") // free | pro | business
+  status               String    @default("active") // active | cancelled | expired | past_due | paused
+  lsCustomerId         String?
+  lsSubscriptionId     String?   @unique
+  lsVariantId          String?
+  stripeCustomerId     String?
+  stripeSubscriptionId String?   @unique
+  stripePriceId        String?
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([status])
 }
 
 model Purchase {
-  id            String    @id @default(cuid())
-  email         String?
-  userId        String?
-  plan          String
-  offerKind     String    // license | ltd
-  status        String    @default("paid")
-  monitorLimit  Int?
-  lsOrderId     String?   @unique
-  lsCustomerId  String?
-  lsVariantId   String?
-  amountCents   Int?
-  currency      String?
-  purchasedAt   DateTime  @default(now())
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                    String   @id @default(cuid())
+  email                 String?
+  userId                String?
+  plan                  String
+  offerKind             String // license | ltd
+  status                String   @default("paid")
+  monitorLimit          Int?
+  lsOrderId             String?  @unique
+  lsCustomerId          String?
+  lsVariantId           String?
+  stripeSessionId       String?  @unique
+  stripeCustomerId      String?
+  stripePriceId         String?
+  stripePaymentIntentId String?
+  amountCents           Int?
+  currency              String?
+  purchasedAt           DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
 
-  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@index([email])
   @@index([plan])
@@ -124,43 +132,43 @@ model Purchase {
 }
 
 model Monitor {
-  id            String   @id @default(cuid())
-  name          String
-  type          String   // website | service | server | ping | dns | blacklist
-  target        String
-  port          Int?
-  interval      Int      @default(60)
-  timeout       Int      @default(30)
-  enabled       Boolean  @default(true)
-  paused        Boolean  @default(false)
+  id       String  @id @default(cuid())
+  name     String
+  type     String // website | service | server | ping | dns | blacklist
+  target   String
+  port     Int?
+  interval Int     @default(60)
+  timeout  Int     @default(30)
+  enabled  Boolean @default(true)
+  paused   Boolean @default(false)
 
-  status        String   @default("pending")
-  uptime        Float    @default(100)
-  responseTime  Int?
-  lastChecked   DateTime?
-  lastDownAt    DateTime?
-  consecutiveFailures Int @default(0)
+  status              String    @default("pending")
+  uptime              Float     @default(100)
+  responseTime        Int?
+  lastChecked         DateTime?
+  lastDownAt          DateTime?
+  consecutiveFailures Int       @default(0)
 
-  thresholdResponseTime Int @default(2000)
-  thresholdRetries      Int @default(2)
+  thresholdResponseTime Int   @default(2000)
+  thresholdRetries      Int   @default(2)
   thresholdCpu          Float @default(85)
   thresholdRam          Float @default(85)
   thresholdDisk         Float @default(90)
 
-  public       Boolean  @default(true)
-  order        Int      @default(0)
+  public Boolean @default(true)
+  order  Int     @default(0)
 
   description  String?
   tags         String?
   region       String?
-  checkRegions String?  // comma-separated list of regions to check from
+  checkRegions String? // comma-separated list of regions to check from
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  checks       Check[]
-  incidents    Incident[]
-  metrics      ServerMetric[]
+  checks        Check[]
+  incidents     Incident[]
+  metrics       ServerMetric[]
   anomalyAlerts AnomalyAlert[]
 
   @@index([status])
@@ -179,76 +187,76 @@ model Check {
   metadata     Json?
   checkedAt    DateTime @default(now())
 
-  monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  monitor Monitor @relation(fields: [monitorId], references: [id], onDelete: Cascade)
 
   @@index([monitorId, checkedAt])
   @@index([region, checkedAt])
 }
 
 model ServerMetric {
-  id           String   @id @default(cuid())
-  monitorId    String
-  cpuUsage     Float
-  cpuCores     Int      @default(1)
-  ramTotal     Float
-  ramUsed      Float
-  ramUsage     Float
-  diskTotal    Float
-  diskUsed     Float
-  diskUsage    Float
-  networkIn    Float
-  networkOut   Float
-  loadAvg1     Float?
-  loadAvg5     Float?
-  loadAvg15    Float?
-  uptime       Float?
-  processes    Int?
-  temperature  Float?
-  metadata     Json?
-  recordedAt   DateTime @default(now())
+  id          String   @id @default(cuid())
+  monitorId   String
+  cpuUsage    Float
+  cpuCores    Int      @default(1)
+  ramTotal    Float
+  ramUsed     Float
+  ramUsage    Float
+  diskTotal   Float
+  diskUsed    Float
+  diskUsage   Float
+  networkIn   Float
+  networkOut  Float
+  loadAvg1    Float?
+  loadAvg5    Float?
+  loadAvg15   Float?
+  uptime      Float?
+  processes   Int?
+  temperature Float?
+  metadata    Json?
+  recordedAt  DateTime @default(now())
 
-  monitor      Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  monitor Monitor @relation(fields: [monitorId], references: [id], onDelete: Cascade)
 
   @@index([monitorId, recordedAt])
 }
 
 model Incident {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   monitorId   String
-  status      String   @default("open")
-  severity    String   @default("warning")
+  status      String    @default("open")
+  severity    String    @default("warning")
   title       String
   description String?
-  startedAt   DateTime @default(now())
+  startedAt   DateTime  @default(now())
   resolvedAt  DateTime?
   duration    Int?
 
-  monitor     Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
-  updates     IncidentUpdate[]
+  monitor Monitor          @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  updates IncidentUpdate[]
 
   @@index([status])
   @@index([startedAt])
 }
 
 model IncidentUpdate {
-  id          String   @id @default(cuid())
-  incidentId  String
-  status      String
-  message     String
-  author      String?
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  incidentId String
+  status     String
+  message    String
+  author     String?
+  createdAt  DateTime @default(now())
 
-  incident    Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  incident Incident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
 }
 
 model NotificationChannel {
-  id          String   @id @default(cuid())
-  type        String
-  name        String
-  config      Json
-  enabled     Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  type      String
+  name      String
+  config    Json
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model NotificationLog {
@@ -288,69 +296,69 @@ model StatusPage {
 // ============================================================
 
 model AnomalyAlert {
-  id          String   @id @default(cuid())
-  monitorId   String
-  metric      String
-  value       Float
-  baseline    Float
-  zScore      Float
-  severity    String
-  status      String   @default("open")
-  message     String
-  detectedAt  DateTime @default(now())
-  resolvedAt  DateTime?
+  id         String    @id @default(cuid())
+  monitorId  String
+  metric     String
+  value      Float
+  baseline   Float
+  zScore     Float
+  severity   String
+  status     String    @default("open")
+  message    String
+  detectedAt DateTime  @default(now())
+  resolvedAt DateTime?
 
-  monitor     Monitor  @relation(fields: [monitorId], references: [id], onDelete: Cascade)
+  monitor Monitor @relation(fields: [monitorId], references: [id], onDelete: Cascade)
 
   @@index([monitorId, detectedAt])
   @@index([status])
 }
 
 model IncidentGroup {
-  id                  String   @id @default(cuid())
-  status              String   @default("open")
-  severity            String   @default("warning")
+  id                  String    @id @default(cuid())
+  status              String    @default("open")
+  severity            String    @default("warning")
   title               String
   rootCauseHypothesis String?
-  startedAt           DateTime @default(now())
+  startedAt           DateTime  @default(now())
   resolvedAt          DateTime?
   incidentIds         String
   monitorIds          String
-  count               Int      @default(1)
-  correlationScore    Float    @default(0)
+  count               Int       @default(1)
+  correlationScore    Float     @default(0)
 
   @@index([status])
   @@index([startedAt])
 }
 
 model Postmortem {
-  id                  String   @id @default(cuid())
-  incidentId          String   @unique
+  id                  String    @id @default(cuid())
+  incidentId          String    @unique
   summary             String
   timeline            String
   rootCause           String
   contributingFactors String
   impact              String
   actionItems         String
-  generatedAt         DateTime @default(now())
+  generatedAt         DateTime  @default(now())
   regeneratedAt       DateTime?
-  model               String   @default("glm-4")
+  model               String    @default("glm-4")
 }
 
 model Journey {
-  id               String       @id @default(cuid())
+  id               String        @id @default(cuid())
   name             String
   description      String?
-  enabled          Boolean      @default(true)
-  interval         Int          @default(300)
-  timeout          Int          @default(60)
-  public           Boolean      @default(false)
-  status           String       @default("pending")
+  enabled          Boolean       @default(true)
+  interval         Int           @default(300)
+  timeout          Int           @default(60)
+  public           Boolean       @default(false)
+  status           String        @default("pending")
   lastChecked      DateTime?
   lastResponseTime Int?
-  uptime           Float        @default(100)
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  uptime           Float         @default(100)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
   steps            JourneyStep[]
   runs             JourneyRun[]
 }
@@ -364,7 +372,7 @@ model JourneyStep {
   value       String?
   description String?
 
-  journey     Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  journey Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
 
   @@index([journeyId, order])
 }
@@ -378,22 +386,22 @@ model JourneyRun {
   stepResults  String?
   checkedAt    DateTime @default(now())
 
-  journey      Journey  @relation(fields: [journeyId], references: [id], onDelete: Cascade)
+  journey Journey @relation(fields: [journeyId], references: [id], onDelete: Cascade)
 
   @@index([journeyId, checkedAt])
 }
 
 model AlertDedup {
-  id          String   @id @default(cuid())
-  fingerprint String   @unique
+  id          String    @id @default(cuid())
+  fingerprint String    @unique
   monitorId   String?
   incidentId  String?
   issueType   String
-  firstSeenAt DateTime @default(now())
-  lastSeenAt  DateTime @default(now())
-  count       Int      @default(1)
-  suppressed  Int      @default(0)
-  status      String   @default("active")
+  firstSeenAt DateTime  @default(now())
+  lastSeenAt  DateTime  @default(now())
+  count       Int       @default(1)
+  suppressed  Int       @default(0)
+  status      String    @default("active")
   nextAlertAt DateTime?
 
   @@index([fingerprint])

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth/auth-options'
-import { billingOffers, createPlanCheckout, type BillingPlan } from '@/lib/lemonsqueezy'
+import { billingOffers, createPlanCheckout, type BillingPlan } from '@/lib/stripe'
 import { checkRateLimit } from '@/lib/rate-limit'
 
 const plans = new Set(Object.keys(billingOffers))
@@ -25,14 +25,11 @@ export async function POST(req: NextRequest) {
       userId: (session?.user as any)?.id,
     })
 
-    if (checkout.error || !checkout.data?.data?.attributes?.url) {
-      return NextResponse.json(
-        { error: checkout.error?.message || 'Unable to create checkout' },
-        { status: checkout.statusCode || 500 },
-      )
+    if (!checkout.url) {
+      return NextResponse.json({ error: 'Unable to create checkout' }, { status: 500 })
     }
 
-    return NextResponse.json({ url: checkout.data.data.attributes.url })
+    return NextResponse.json({ url: checkout.url })
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Checkout failed' }, { status: 500 })
   }

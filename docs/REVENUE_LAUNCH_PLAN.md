@@ -27,8 +27,8 @@ AppSumo tiers include hosted access only. Self-hosted licenses are sold separate
 
 ### Week 1 - Revenue readiness
 
-- Create Lemon Squeezy variants for all paid offers.
-- Add the production variant IDs to Railway.
+- Create Stripe products and prices for all paid offers.
+- Add the production price IDs to Railway.
 - Point `afrikintel.com` at Railway and set `NEXTAUTH_URL=https://afrikintel.com`.
 - Test SaaS checkout, LTD checkout, self-hosted checkout, and webhooks.
 - Verify `/demo`, GitHub OAuth, SMTP, and one monitor-to-incident workflow.
@@ -64,7 +64,7 @@ AppSumo tiers include hosted access only. Self-hosted licenses are sold separate
 - `https://afrikintel.com/landing` loads.
 - `https://afrikintel.com/appsumo` loads.
 - `https://afrikintel.com/demo` logs reviewers into the demo account.
-- Pricing buttons open the correct Lemon Squeezy checkouts.
+- Pricing buttons open the correct Stripe checkouts.
 - Webhook records subscriptions and one-time purchases.
 - SMTP sends a real alert email.
 - GitHub OAuth callback works in production.

@@ -8,7 +8,7 @@ const sections = [
   },
   {
     title: 'Hosted subscriptions',
-    body: 'Monthly hosted plans can be cancelled before the next renewal date. If a billing issue or duplicate charge occurs, contact support within 14 days and include the Lemon Squeezy order email.',
+    body: 'Monthly hosted plans can be cancelled before the next renewal date. If a billing issue or duplicate charge occurs, contact support within 14 days and include the Stripe receipt email.',
   },
   {
     title: 'Self-hosted licenses',
@@ -33,7 +33,7 @@ export default function RefundPolicyPage() {
         <section>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Refund policy</h1>
           <p className="mt-4 text-muted-foreground">
-            Afrikintel is sold through Lemon Squeezy and AppSumo. Refund handling depends on where the purchase was made.
+            Afrikintel is sold through Stripe and AppSumo. Refund handling depends on where the purchase was made.
           </p>
         </section>
 
