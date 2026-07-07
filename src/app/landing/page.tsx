@@ -196,7 +196,7 @@ export default function LandingPage() {
             <a href="#how-it-works" className="nav-link hover:text-foreground transition-colors">How it works</a>
             <a href="#pricing" className="nav-link hover:text-foreground transition-colors">Pricing</a>
             <Link href="/appsumo" className="nav-link hover:text-foreground transition-colors">AppSumo</Link>
-            <a href="https://github.com/NewAfrikwave/afrikintel" target="_blank" rel="noopener" className="nav-link hover:text-foreground transition-colors">GitHub</a>
+            <Link href="/docs" className="nav-link hover:text-foreground transition-colors">Docs</Link>
           </div>
           <div className="flex items-center gap-2">
             {session ? (

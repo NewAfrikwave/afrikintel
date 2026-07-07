@@ -5,10 +5,10 @@ const navLinks = [
   { label: 'Pricing', href: '/pricing' },
   { label: 'AppSumo', href: '/appsumo' },
   { label: 'Demo', href: '/demo' },
+  { label: 'Docs', href: '/docs' },
   { label: 'Status', href: '/status' },
   { label: 'Support', href: 'mailto:support@afrikintel.com' },
   { label: 'Refund policy', href: '/refund-policy' },
-  { label: 'GitHub', href: 'https://github.com/NewAfrikwave/afrikintel', external: true },
 ]
 
 export function MarketingFooter() {
