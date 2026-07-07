@@ -22,27 +22,26 @@ bun run seed:demo
 
 ## Product Description
 
-Afrikintel is self-hosted monitoring for teams that need signal, not alert noise. It monitors websites, TCP services, DNS, ping targets, blacklist status, and server agents, then uses smart deduplication, incident correlation, anomaly detection, and AI-assisted postmortems to reduce operational churn. Teams can run it free on their own infrastructure or use hosted plans when they want Afrikintel to manage the stack.
+Afrikintel is a self-hosted monitoring project for teams that need signal, not alert noise. It monitors websites, TCP services, DNS, ping targets, blacklist status, server agents, and synthetic journeys, then uses smart deduplication, incident correlation, anomaly detection, and AI-assisted postmortems to reduce operational churn. Buyers use the hosted server as a live demo, then run Afrikintel on their own infrastructure.
 
 ## AppSumo LTD Tiers
 
-- Tier 1: `$59`, 50 hosted monitors, smart alert dedup, AI postmortems, multi-region checks.
-- Tier 2: `$99`, 200 hosted monitors, priority support queue, team-ready dashboard, future hosted updates.
-- LTD tiers include hosted access only. Source-code ownership is not included.
+- Tier 1: `$59`, 1 production instance, project/source package, install guide, 12 months of updates.
+- Tier 2: `$99`, up to 5 production instances, commercial use, project/source package, priority setup support.
+- LTD tiers include self-hosted license access. Managed hosted monitoring is not included.
 
 ## Standard Pricing
 
-- Free hosted/self-hosted trial: `$0`, 10 monitors, public status page, community support.
-- Hosted Pro: `$19/mo`, 50 monitors, AI postmortems, multi-region checks, email support.
-- Business: `$79/mo`, 200 monitors, priority support, team seats, 30-second checks.
-- Personal self-hosted license: `$99`, 1 instance, 12 months of updates.
-- Team self-hosted license: `$249`, up to 5 instances, 12 months of updates, email support.
+- Live demo: `$0`, reviewer access at `/demo`.
+- Personal self-hosted license: `$99`, 1 production instance, 12 months of updates.
+- Team self-hosted license: `$249`, up to 5 production instances, 12 months of updates, email setup support.
 
-## 6-Month Decision Gate
+## Operating Model
 
-- `$3K+ MRR`: keep building toward `$10K MRR`.
-- `$1K-$3K MRR`: continue only if support load is manageable and acquisition is repeatable.
-- `<$1K MRR`: package AppSumo revenue, users, reviews, and MRR for Acquire.com.
+- Keep the Railway deployment as the live demo and reviewer proof environment.
+- Sell self-hosted licenses through AppSumo first.
+- Use Stripe only for optional direct self-hosted license purchases outside AppSumo.
+- Do not promise managed hosting, monthly SaaS accounts, or ongoing infrastructure operations.
 
 ## Required Screenshots
 
@@ -62,7 +61,7 @@ Use at least five from `download/`:
 - Demo account seeded and tested.
 - GitHub OAuth callback points to production.
 - SMTP credentials configured.
-- Stripe checkout and webhook configured for SaaS, AppSumo LTD, and self-hosted license prices.
+- AppSumo listing terms, install guide, license terms, refund policy, and optional Stripe direct-license checkout configured.
 - Railway PostgreSQL attached and schema pushed.
 - SSL active on `afrikintel.com`.
 - Screenshots uploaded.

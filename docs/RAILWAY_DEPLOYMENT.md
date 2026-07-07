@@ -20,6 +20,12 @@ NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
 NEXTAUTH_URL="https://afrikintel.com"
 GITHUB_ID="github-oauth-client-id"
 GITHUB_SECRET="github-oauth-client-secret"
+CHECK_REGIONS="us-east,eu-west,ap-southeast"
+```
+
+Optional:
+
+```env
 SMTP_HOST="smtp.provider.com"
 SMTP_PORT="587"
 SMTP_USER="alerts@afrikintel.com"
@@ -28,18 +34,8 @@ SMTP_FROM="alerts@afrikintel.com"
 STRIPE_SECRET_KEY="sk_live_or_test_key"
 STRIPE_WEBHOOK_SECRET="whsec_webhook_secret"
 STRIPE_AUTOMATIC_TAX="0"
-STRIPE_PRO_PRICE_ID="price_pro_monthly"
-STRIPE_BUSINESS_PRICE_ID="price_business_monthly"
 STRIPE_SELF_HOSTED_PERSONAL_PRICE_ID="price_self_hosted_personal"
 STRIPE_SELF_HOSTED_TEAM_PRICE_ID="price_self_hosted_team"
-STRIPE_APPSUMO_TIER1_PRICE_ID="price_appsumo_tier_1"
-STRIPE_APPSUMO_TIER2_PRICE_ID="price_appsumo_tier_2"
-CHECK_REGIONS="us-east,eu-west,ap-southeast"
-```
-
-Optional:
-
-```env
 UPSTASH_REDIS_REST_URL="..."
 UPSTASH_REDIS_REST_TOKEN="..."
 SENTRY_DSN="..."
@@ -53,4 +49,4 @@ SENTRY_TRACES_SAMPLE_RATE="0.1"
 3. Set the Stripe webhook URL to `https://afrikintel.com/api/stripe/webhook`.
 4. Run `bun run seed:demo` against the production database once to create the reviewer account.
 5. Verify `/landing`, `/appsumo`, `/pricing`, `/demo`, `/dashboard`, and `/api/engine`.
-6. Test one checkout for each active offer family: AppSumo LTD, hosted SaaS, and self-hosted license.
+6. Test the live demo and optional direct Stripe checkout for self-hosted licenses.

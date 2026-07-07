@@ -68,27 +68,27 @@ const plans = [
     name: 'AppSumo Tier 1',
     price: '$59',
     period: 'lifetime',
-    description: 'Hosted lifetime access for the launch cohort.',
-    features: ['50 hosted monitors', 'Smart alert dedup', 'AI postmortems', 'Multi-region checks', 'Hosted updates included'],
+    description: 'Self-hosted license for one production instance.',
+    features: ['1 production instance', 'Project/source package', 'Install guide', '12 months of updates', 'Setup support'],
     cta: 'View LTD',
     href: '/appsumo',
-    highlighted: false,
+    highlighted: true,
   },
   {
-    name: 'Hosted Pro',
-    price: '$19',
-    period: '/month',
-    description: 'We host it, you monitor. For teams that want convenience.',
-    features: ['50 monitors', 'All 5 AI features', '8 notification channels', 'Multi-region checks', '5-minute check intervals', 'Email support'],
-    cta: 'Start Free Trial',
-    href: '/pricing',
-    highlighted: true,
+    name: 'AppSumo Tier 2',
+    price: '$99',
+    period: 'lifetime',
+    description: 'Team license for up to five production instances.',
+    features: ['Up to 5 instances', 'Commercial use', 'Project/source package', 'Priority setup support', '12 months of updates'],
+    cta: 'View AppSumo Terms',
+    href: '/appsumo',
+    highlighted: false,
   },
   {
     name: 'Self-hosted Team',
     price: '$249',
     period: 'one-time',
-    description: 'Run Afrikintel on your own infrastructure with support.',
+    description: 'Optional direct license outside AppSumo.',
     features: ['Up to 5 instances', '12 months of updates', 'Commercial use', 'Email support', 'Portable deployment docs'],
     cta: 'Buy License',
     href: '/pricing',
@@ -579,10 +579,10 @@ export default function LandingPage() {
               Pricing
             </div>
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-3">
-              Launch deal first. <span className="gradient-text">SaaS revenue next.</span>
+              AppSumo first. <span className="gradient-text">Self-hosted only.</span>
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Afrikintel is priced for an AppSumo cash injection, recurring hosted SaaS, and a secondary self-hosted license channel.
+              Afrikintel is sold as a self-hosted monitoring project. The hosted server is a live demo for reviewers and buyers.
             </p>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">

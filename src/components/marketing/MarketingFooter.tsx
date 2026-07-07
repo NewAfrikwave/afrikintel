@@ -6,8 +6,10 @@ const navLinks: Array<{ label: string; href: string; external?: boolean }> = [
   { label: 'AppSumo', href: '/appsumo' },
   { label: 'Demo', href: '/demo' },
   { label: 'Docs', href: '/docs' },
+  { label: 'Install', href: '/docs/install' },
   { label: 'Status', href: '/status' },
   { label: 'Support', href: 'mailto:support@afrikintel.com' },
+  { label: 'License terms', href: '/license-terms' },
   { label: 'Refund policy', href: '/refund-policy' },
 ]
 

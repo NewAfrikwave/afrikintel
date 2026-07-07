@@ -3,16 +3,16 @@ import { MarketingFooter } from '@/components/marketing/MarketingFooter'
 
 const sections = [
   {
-    title: 'AppSumo lifetime deals',
+    title: 'AppSumo self-hosted licenses',
     body: 'AppSumo purchases follow AppSumo platform refund terms, including the 30-day money-back guarantee when offered through AppSumo. Refund requests for AppSumo purchases should be started from the buyer account on AppSumo.',
   },
   {
-    title: 'Hosted subscriptions',
-    body: 'Monthly hosted plans can be cancelled before the next renewal date. If a billing issue or duplicate charge occurs, contact support within 14 days and include the Stripe receipt email.',
+    title: 'Direct Stripe licenses',
+    body: 'Direct self-hosted license purchases are digital goods. If delivery fails, a duplicate charge occurs, or the license package cannot be accessed, contact support within 14 days and include the Stripe receipt email.',
   },
   {
-    title: 'Self-hosted licenses',
-    body: 'Self-hosted license purchases are digital goods. If the license cannot be delivered or activated, contact support within 14 days so we can resolve the issue or review a refund.',
+    title: 'Demo server',
+    body: 'The hosted Afrikintel server is provided for review and demonstration only. Buyers are responsible for operating their own production deployment after purchase.',
   },
 ]
 
@@ -33,7 +33,7 @@ export default function RefundPolicyPage() {
         <section>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Refund policy</h1>
           <p className="mt-4 text-muted-foreground">
-            Afrikintel is sold through Stripe and AppSumo. Refund handling depends on where the purchase was made.
+            Afrikintel is sold as a self-hosted project/license package through AppSumo and optional direct Stripe checkout. Refund handling depends on where the purchase was made.
           </p>
         </section>
 

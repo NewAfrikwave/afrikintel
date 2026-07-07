@@ -2,15 +2,14 @@
 
 import { useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import {
   ArrowRight,
   Check,
   Download,
-  Infinity,
+  ExternalLink,
   Loader2,
+  PackageCheck,
   Server,
-  ShieldCheck,
   Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -26,7 +25,7 @@ type PricingOffer = {
   cta: string
   tag?: string
   highlighted?: boolean
-  external?: boolean
+  action: 'appsumo' | 'stripe'
 }
 
 const appsumoOffers: PricingOffer[] = [
@@ -35,96 +34,75 @@ const appsumoOffers: PricingOffer[] = [
     name: 'AppSumo Tier 1',
     price: '$59',
     period: 'lifetime',
-    description: 'Hosted lifetime access for reviewers, founders, and early teams.',
-    features: ['50 hosted monitors', 'Smart alert dedup', 'AI postmortems', 'Multi-region checks', 'Reviewer-ready demo onboarding'],
-    cta: 'Claim Tier 1',
-    tag: 'Launch offer',
+    description: 'Self-hosted license for one production instance. Buyers use the live demo to review the product before purchase.',
+    features: ['1 production instance', 'Source/project access through the buyer package', 'Setup guide', '12 months of updates', 'Email support for setup blockers'],
+    cta: 'View AppSumo terms',
+    tag: 'Primary launch',
     highlighted: true,
+    action: 'appsumo',
   },
   {
     id: 'appsumo_tier2',
     name: 'AppSumo Tier 2',
     price: '$99',
     period: 'lifetime',
-    description: 'A larger LTD for agencies and teams monitoring multiple client stacks.',
-    features: ['200 hosted monitors', 'Priority support queue', 'Team-ready dashboard', '30-second checks where available', 'Future hosted updates included'],
-    cta: 'Claim Tier 2',
-    tag: 'Best LTD value',
+    description: 'Team license for buyers running Afrikintel across internal or client environments.',
+    features: ['Up to 5 production instances', 'Source/project access through the buyer package', 'Commercial use', '12 months of updates', 'Priority setup support'],
+    cta: 'View AppSumo terms',
+    tag: 'Best AppSumo value',
+    action: 'appsumo',
   },
 ]
 
-const hostedOffers: PricingOffer[] = [
-  {
-    id: 'free',
-    name: 'Free',
-    price: '$0',
-    period: 'forever',
-    description: 'Use Afrikintel for a small hosted setup or a self-hosted trial.',
-    features: ['10 monitors', '5-minute checks', 'Public status page', 'Community support'],
-    cta: 'Start Free',
-  },
-  {
-    id: 'pro',
-    name: 'Hosted Pro',
-    price: '$19',
-    period: '/mo',
-    description: 'Managed monitoring for small teams and freelancers.',
-    features: ['50 monitors', '1-minute checks', 'AI postmortems', 'Multi-region checks', 'Email support'],
-    cta: 'Start Pro',
-    highlighted: true,
-  },
-  {
-    id: 'business',
-    name: 'Business',
-    price: '$79',
-    period: '/mo',
-    description: 'More monitor volume and faster support for operational teams.',
-    features: ['200 monitors', '30-second checks', 'Team seats', 'Priority support', 'Incident intelligence'],
-    cta: 'Start Business',
-  },
-]
-
-const licenseOffers: PricingOffer[] = [
+const directLicenseOffers: PricingOffer[] = [
   {
     id: 'self_hosted_personal',
     name: 'Personal License',
     price: '$99',
     period: 'one-time',
-    description: 'Run one private Afrikintel instance with 12 months of updates.',
-    features: ['1 self-hosted instance', '12 months of updates', 'Personal/commercial use', 'Email receipt and license record'],
+    description: 'Direct purchase for buyers who want the self-hosted project outside AppSumo.',
+    features: ['1 production instance', 'Personal/commercial use', '12 months of updates', 'Install guide', 'Stripe receipt and license record'],
     cta: 'Buy Personal',
+    action: 'stripe',
   },
   {
     id: 'self_hosted_team',
     name: 'Team License',
     price: '$249',
     period: 'one-time',
-    description: 'For teams running Afrikintel across internal or client environments.',
-    features: ['Up to 5 instances', '12 months of updates', 'Email support', 'Team/commercial use'],
+    description: 'Direct team license for internal teams, agencies, and client environments.',
+    features: ['Up to 5 production instances', 'Commercial use', '12 months of updates', 'Email setup support', 'Portable deployment docs'],
     cta: 'Buy Team',
     highlighted: true,
+    action: 'stripe',
   },
 ]
 
+const proofPoints = [
+  'The hosted Afrikintel server is a live demo only, not a managed monitoring service.',
+  'AppSumo buyers purchase self-hosted license access, not ongoing hosted infrastructure.',
+  'Direct Stripe checkout is only for self-hosted licenses sold outside AppSumo.',
+  'Install docs, license terms, refund policy, and support expectations are published before submission.',
+]
+
 export default function PricingPage() {
-  const router = useRouter()
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const search = useHydratedSearch()
   const licenseSuccess = new URLSearchParams(search).get('license') === '1'
 
-  async function checkout(plan: string) {
-    if (plan === 'free') {
-      router.push('/demo')
+  async function checkout(offer: PricingOffer) {
+    if (offer.action === 'appsumo') {
+      window.location.href = '/appsumo'
       return
     }
 
     setError(null)
-    setLoadingPlan(plan)
+    setLoadingPlan(offer.id)
     const res = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan }),
+      body: JSON.stringify({ plan: offer.id }),
     })
     const data = await res.json()
     setLoadingPlan(null)
@@ -134,7 +112,7 @@ export default function PricingPage() {
       return
     }
 
-    router.push(data.url)
+    window.location.href = data.url
   }
 
   return (
@@ -155,22 +133,40 @@ export default function PricingPage() {
           </div>
         </nav>
 
-        <section className="max-w-3xl">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            <Sparkles className="h-3.5 w-3.5" />
-            AppSumo-first launch model
+        <section className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
+          <div>
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <Sparkles className="h-3.5 w-3.5" />
+              AppSumo-first self-hosted launch
+            </div>
+            <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
+              Buy Afrikintel as a self-hosted monitoring project.
+            </h1>
+            <p className="mt-5 text-lg text-muted-foreground">
+              The live server is here for review and demos. Buyers get a self-hosted license/project package they can run on their own infrastructure.
+            </p>
           </div>
-          <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
-            Lifetime launch deals, hosted SaaS, and self-hosted licenses.
-          </h1>
-          <p className="mt-5 text-lg text-muted-foreground">
-            Start with the AppSumo LTD if you want the best early deal. Use hosted plans for recurring monitoring, or buy a self-hosted license for your own infrastructure.
-          </p>
+          <div className="rounded-lg border border-border bg-card p-5">
+            <div className="flex items-center gap-2 text-sm font-medium text-primary">
+              <Server className="h-4 w-4" />
+              Demo-first proof
+            </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">
+              Review the dashboard, monitors, incidents, status page, and postmortem flow before buying. No hosted SaaS subscription is being sold.
+            </p>
+            <Link
+              href="/demo"
+              className="mt-5 inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border px-4 text-sm font-medium hover:bg-muted"
+            >
+              Open live demo
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </section>
 
         {licenseSuccess && (
           <div className="rounded-md border border-primary/40 bg-primary/10 px-4 py-3 text-sm text-primary">
-            Purchase complete. Check your Stripe receipt for license and download details.
+            Purchase complete. Check your Stripe receipt for license and delivery details.
           </div>
         )}
 
@@ -181,41 +177,50 @@ export default function PricingPage() {
         )}
 
         <PricingSection
-          eyebrow="Cash injection and launch proof"
-          title="AppSumo Lifetime Deal"
-          description="Hosted lifetime access for the first launch cohort. These buyers do not receive source-code ownership."
-          icon={Infinity}
+          eyebrow="Main launch channel"
+          title="AppSumo Lifetime Licenses"
+          description="Use these tiers for AppSumo listing, reviews, testimonials, and validation. These are self-hosted licenses, not hosted accounts."
+          icon={PackageCheck}
           offers={appsumoOffers}
           loadingPlan={loadingPlan}
           checkout={checkout}
         />
 
         <PricingSection
-          eyebrow="Recurring revenue"
-          title="Hosted SaaS"
-          description="Monthly plans for customers who want Afrikintel operated for them."
-          icon={ShieldCheck}
-          offers={hostedOffers}
-          loadingPlan={loadingPlan}
-          checkout={checkout}
-        />
-
-        <PricingSection
-          eyebrow="Passive secondary channel"
-          title="Self-hosted Licenses"
-          description="One-time licenses for teams that prefer to run Afrikintel on their own infrastructure."
-          icon={Server}
-          offers={licenseOffers}
+          eyebrow="Optional direct sales"
+          title="Direct Self-hosted Licenses"
+          description="Stripe checkout remains available only for buyers outside AppSumo who want a direct license."
+          icon={Download}
+          offers={directLicenseOffers}
           loadingPlan={loadingPlan}
           checkout={checkout}
         />
 
         <section className="rounded-lg border border-border bg-card p-6">
-          <h2 className="text-lg font-semibold">6-month decision gate</h2>
-          <div className="mt-4 grid gap-3 text-sm text-muted-foreground md:grid-cols-3">
-            <DecisionCard title="$3K+ MRR" body="Keep building toward $10K MRR and a higher acquisition multiple." />
-            <DecisionCard title="$1K-$3K MRR" body="Continue only if support load is manageable and acquisition is repeatable." />
-            <DecisionCard title="< $1K MRR" body="Package AppSumo revenue, reviews, users, and MRR for Acquire.com." />
+          <h2 className="text-lg font-semibold">What buyers are getting</h2>
+          <ul className="mt-4 grid gap-3 text-sm text-muted-foreground md:grid-cols-2">
+            {proofPoints.map((point) => (
+              <li key={point} className="flex gap-2">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>{point}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/docs/install"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border px-4 text-sm font-medium hover:bg-muted"
+            >
+              Install guide
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/license-terms"
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-border px-4 text-sm font-medium hover:bg-muted"
+            >
+              License terms
+              <ExternalLink className="h-4 w-4" />
+            </Link>
           </div>
         </section>
       </div>
@@ -239,7 +244,7 @@ function PricingSection({
   icon: typeof Sparkles
   offers: PricingOffer[]
   loadingPlan: string | null
-  checkout: (plan: string) => void
+  checkout: (offer: PricingOffer) => void
 }) {
   return (
     <section>
@@ -253,7 +258,7 @@ function PricingSection({
           <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         </div>
       </div>
-      <div className={cn('grid gap-4', offers.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3')}>
+      <div className="grid gap-4 md:grid-cols-2">
         {offers.map((offer) => (
           <article
             key={offer.id}
@@ -287,7 +292,7 @@ function PricingSection({
 
             <button
               type="button"
-              onClick={() => checkout(offer.id)}
+              onClick={() => checkout(offer)}
               disabled={loadingPlan === offer.id}
               className={cn(
                 'mt-auto flex h-11 items-center justify-center gap-2 rounded-md border px-4 text-sm font-medium transition-colors',
@@ -298,7 +303,7 @@ function PricingSection({
             >
               {loadingPlan === offer.id ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
-              ) : offer.id.startsWith('self_hosted') ? (
+              ) : offer.action === 'stripe' ? (
                 <Download className="h-4 w-4" />
               ) : (
                 <ArrowRight className="h-4 w-4" />
@@ -309,15 +314,6 @@ function PricingSection({
         ))}
       </div>
     </section>
-  )
-}
-
-function DecisionCard({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded-md border border-border bg-background/60 p-4">
-      <div className="font-medium text-foreground">{title}</div>
-      <p className="mt-1">{body}</p>
-    </div>
   )
 }
 

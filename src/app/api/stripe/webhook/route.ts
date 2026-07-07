@@ -1,19 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { db } from '@/lib/db'
-import { billingOfferFromPrice, billingPlanFromPrice, stripeClient } from '@/lib/stripe'
-
-function periodEnd(subscription: Stripe.Subscription) {
-  const item = subscription.items.data[0]
-  const value = item?.current_period_end || subscription.ended_at || subscription.trial_end
-  return value ? new Date(value * 1000) : null
-}
-
-function subscriptionStatus(status?: Stripe.Subscription.Status | null) {
-  if (!status) return 'active'
-  if (status === 'canceled') return 'cancelled'
-  return status
-}
+import { billingOfferFromPrice, stripeClient } from '@/lib/stripe'
 
 function sessionEmail(session: Stripe.Checkout.Session) {
   return session.customer_details?.email || session.customer_email || undefined
@@ -32,45 +20,11 @@ async function findUser(userId?: string | null, email?: string | null) {
   return null
 }
 
-async function upsertSubscription(subscription: Stripe.Subscription, fallback?: Stripe.Checkout.Session) {
-  const item = subscription.items.data[0]
-  const priceId = item?.price?.id
-  const metadata = { ...subscription.metadata, ...(fallback?.metadata || {}) }
-  const email = fallback ? sessionEmail(fallback) : undefined
-  const user = await findUser(metadata.user_id, email)
-
-  if (!user) {
-    return { ignored: 'user_not_found' }
-  }
-
-  await db.subscription.upsert({
-    where: { stripeSubscriptionId: subscription.id },
-    create: {
-      userId: user.id,
-      plan: billingPlanFromPrice(priceId),
-      status: subscriptionStatus(subscription.status),
-      stripeCustomerId: subscription.customer?.toString(),
-      stripeSubscriptionId: subscription.id,
-      stripePriceId: priceId,
-      currentPeriodEnd: periodEnd(subscription),
-    },
-    update: {
-      plan: billingPlanFromPrice(priceId),
-      status: subscriptionStatus(subscription.status),
-      stripeCustomerId: subscription.customer?.toString(),
-      stripePriceId: priceId,
-      currentPeriodEnd: periodEnd(subscription),
-    },
-  })
-
-  return { ok: true }
-}
-
 async function upsertPurchase(session: Stripe.Checkout.Session) {
   const priceId = session.line_items?.data[0]?.price?.id
   const offer = billingOfferFromPrice(priceId)
-  if (!offer || offer.kind === 'subscription') {
-    return { ignored: 'non_purchase_offer' }
+  if (!offer) {
+    return { ignored: 'unknown_license_offer' }
   }
 
   const email = sessionEmail(session)
@@ -84,7 +38,7 @@ async function upsertPurchase(session: Stripe.Checkout.Session) {
       plan: offer.plan,
       offerKind: offer.kind,
       status: session.payment_status || 'paid',
-      monitorLimit: offer.monitorLimit,
+      monitorLimit: null,
       stripeSessionId: session.id,
       stripeCustomerId: session.customer?.toString(),
       stripePriceId: priceId,
@@ -99,7 +53,7 @@ async function upsertPurchase(session: Stripe.Checkout.Session) {
       plan: offer.plan,
       offerKind: offer.kind,
       status: session.payment_status || 'paid',
-      monitorLimit: offer.monitorLimit,
+      monitorLimit: null,
       stripeCustomerId: session.customer?.toString(),
       stripePriceId: priceId,
       stripePaymentIntentId: session.payment_intent?.toString(),
@@ -137,22 +91,10 @@ export async function POST(req: NextRequest) {
       expand: ['line_items.data.price'],
     })
 
-    if (session.mode === 'subscription' && session.subscription) {
-      const subscription = await stripe.subscriptions.retrieve(session.subscription.toString())
-      await upsertSubscription(subscription, session)
-    } else if (session.mode === 'payment') {
+    if (session.mode === 'payment') {
       await upsertPurchase(session)
     }
 
-    return NextResponse.json({ ok: true })
-  }
-
-  if (
-    event.type === 'customer.subscription.created' ||
-    event.type === 'customer.subscription.updated' ||
-    event.type === 'customer.subscription.deleted'
-  ) {
-    await upsertSubscription(event.data.object as Stripe.Subscription)
     return NextResponse.json({ ok: true })
   }
 

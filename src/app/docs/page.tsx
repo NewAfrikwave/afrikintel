@@ -2,7 +2,6 @@ import Link from 'next/link'
 import {
   ArrowRight,
   CheckCircle2,
-  Cloud,
   Code2,
   Database,
   KeyRound,
@@ -15,8 +14,8 @@ import { MarketingFooter } from '@/components/marketing/MarketingFooter'
 
 const quickStart = [
   {
-    title: 'Choose hosted or self-hosted',
-    body: 'Hosted plans are managed by Afrikintel. Self-hosted licenses are for teams that want to run the stack on their own infrastructure.',
+    title: 'Review the live demo',
+    body: 'Use /demo to inspect the product before buying. The hosted server is for review, not managed customer hosting.',
     icon: Server,
   },
   {
@@ -26,7 +25,7 @@ const quickStart = [
   },
   {
     title: 'Configure secrets',
-    body: 'Set auth, SMTP, Stripe, and optional GitHub OAuth variables before launch.',
+    body: 'Set auth, SMTP, and optional Stripe variables if you want to sell direct licenses from your own deployment.',
     icon: KeyRound,
   },
   {
@@ -40,17 +39,22 @@ const requiredVars = [
   'DATABASE_URL',
   'NEXTAUTH_SECRET',
   'NEXTAUTH_URL',
-  'STRIPE_SECRET_KEY',
-  'STRIPE_WEBHOOK_SECRET',
-  'STRIPE_PRO_PRICE_ID',
-  'STRIPE_BUSINESS_PRICE_ID',
-  'STRIPE_SELF_HOSTED_PERSONAL_PRICE_ID',
-  'STRIPE_SELF_HOSTED_TEAM_PRICE_ID',
-  'STRIPE_APPSUMO_TIER1_PRICE_ID',
-  'STRIPE_APPSUMO_TIER2_PRICE_ID',
+  'CHECK_REGIONS',
 ]
 
-const optionalVars = ['GITHUB_ID', 'GITHUB_SECRET', 'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM']
+const optionalVars = [
+  'GITHUB_ID',
+  'GITHUB_SECRET',
+  'SMTP_HOST',
+  'SMTP_PORT',
+  'SMTP_USER',
+  'SMTP_PASS',
+  'SMTP_FROM',
+  'STRIPE_SECRET_KEY',
+  'STRIPE_WEBHOOK_SECRET',
+  'STRIPE_SELF_HOSTED_PERSONAL_PRICE_ID',
+  'STRIPE_SELF_HOSTED_TEAM_PRICE_ID',
+]
 
 export default function DocsPage() {
   return (
@@ -80,14 +84,14 @@ export default function DocsPage() {
             Deploy, configure, and launch Afrikintel.
           </h1>
           <p className="mt-5 text-lg text-muted-foreground">
-            A practical setup guide for hosted buyers, self-hosted license holders, and AppSumo reviewers who want to understand how Afrikintel runs in production.
+            A practical guide for AppSumo reviewers and self-hosted license buyers. The live server proves the product; buyers run their own production instance.
           </p>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row">
             <Link
-              href="/pricing"
+              href="/docs/install"
               className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
-              View plans
+              Install guide
               <ArrowRight className="h-4 w-4" />
             </Link>
             <a
@@ -112,14 +116,14 @@ export default function DocsPage() {
         <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <article className="rounded-lg border border-border bg-card p-6">
             <div className="flex items-center gap-2 text-sm font-medium text-primary">
-              <Cloud className="h-4 w-4" />
-              Recommended production deployment
+              <Server className="h-4 w-4" />
+              Recommended buyer deployment
             </div>
             <ol className="mt-5 space-y-4 text-sm text-muted-foreground">
-              <DocStep title="Create Railway services" body="Use one web service from the GitHub repo plus the Railway PostgreSQL plugin. The Docker start script runs the app and monitor worker for the first launch." />
-              <DocStep title="Set the public URL" body="Use NEXTAUTH_URL=https://afrikintel.com after the custom domain is connected." />
-              <DocStep title="Configure Stripe" body="Create products and prices for SaaS, AppSumo LTD, and self-hosted licenses. Set the webhook URL to /api/stripe/webhook." />
-              <DocStep title="Seed and test the demo" body="The reviewer flow uses /demo and signs in as demo@afrikintel.com." />
+              <DocStep title="Use the live demo first" body="The reviewer flow uses /demo and signs in as demo@afrikintel.com." />
+              <DocStep title="Install your own instance" body="Use the Dockerfile with PostgreSQL. The Docker start script runs the app and monitor worker for a simple first launch." />
+              <DocStep title="Configure optional Stripe" body="Only create Stripe prices if you want to sell direct self-hosted licenses outside AppSumo." />
+              <DocStep title="Read the license terms" body="AppSumo and direct buyers receive self-hosted license access, not managed hosted infrastructure." />
             </ol>
           </article>
 
@@ -153,11 +157,11 @@ export default function DocsPage() {
           <article className="rounded-lg border border-border bg-card p-6">
             <div className="flex items-center gap-2 text-sm font-medium text-primary">
               <Webhook className="h-4 w-4" />
-              Billing endpoints
+              Direct license endpoints
             </div>
             <div className="mt-4 space-y-3 text-sm">
-              <Endpoint method="POST" path="/api/checkout" body="Creates Stripe checkouts for AppSumo LTDs, hosted SaaS, and self-hosted licenses." />
-              <Endpoint method="POST" path="/api/stripe/webhook" body="Records subscription events and one-time purchase events." />
+              <Endpoint method="POST" path="/api/checkout" body="Creates optional Stripe checkouts for direct self-hosted license purchases." />
+              <Endpoint method="POST" path="/api/stripe/webhook" body="Records one-time direct license purchases." />
             </div>
           </article>
 
@@ -168,7 +172,8 @@ export default function DocsPage() {
             </div>
             <ul className="mt-4 space-y-3 text-sm text-muted-foreground">
               <li>Open /landing, /appsumo, /pricing, /demo, /status, and /refund-policy.</li>
-              <li>Confirm checkout opens for each paid offer after price IDs are set.</li>
+              <li>Open /docs/install and /license-terms.</li>
+              <li>Confirm optional direct-license checkout opens after Stripe price IDs are set.</li>
               <li>Create a monitor and confirm checks appear in the dashboard.</li>
               <li>Test SMTP with a real alert channel before AppSumo submission.</li>
               <li>Scan Railway logs for Prisma, webhook, or runtime errors.</li>
